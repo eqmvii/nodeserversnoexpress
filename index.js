@@ -22,29 +22,98 @@ connection.connect(function (err) {
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
     var path = request.url;
-    console.log(`Request method: ${request.method}`);
-    console.log(`Path requested: ${path}`);
+    console.log(`Request method: ${request.method}; Path requested: ${path}`);
     serverLog(path);
 
-    switch (path) {
-        case "/":
-            displayHome(path, request, response);
-            break;
-        case "/goodbye":
-            displayGoodbye(path, request, response);
-            break;
-        case "/style.css":
-            sendStyles(path, request, response);
-            break;
-        case "/test.html":
-            sendTestHTML(path, request, response);
-            break;
-        case "/redirecttest":
-            redirectTest(path, request, response);
-            break;
-        default:
-            error404Page(path, request, response);
+    if (request.method === "POST") {
+        console.log("POST INCOMING AWOOGA");
+        let body = []; // Node.js body parsing boilerplate
+        request.on('data', (chunk) => {
+            body.push(chunk);
+        }).on('end', () => {
+            body = Buffer.concat(body).toString();
+            console.log(`Original post body: ${body}`);
+            var postUrl = body.split("=")[1].replace(/\+/g, " ").replace(/\%2F/g, "/").replace(/\%3A/g, ":");
+            console.log(`Decoded: ${decodeURI(postUrl)}`);
+            // console.log(`Das YouAreEL: ${myUrl.toString()}`);
+            console.log(postUrl)
+            omniLog(`POST of URL ${postUrl}`);
+            addUrlToDb(postUrl, (results) => {
+                console.log(results);
+                redirectTest(path, request, response);
+            });
+        });
+    } else { // so it's a GET
+        // test for re-routing
+        var chunk = path.substring(1, path.length);
+        connection.query(`SELECT * FROM urls WHERE urlong = '${chunk}'`, (err, res) => {
+            if (err) throw err;
+            if (res.length > 0) { // i.e. the URL exists
+                console.log(`Exists! Should redirect to ${res[0].url}`);
+                redirectArbitrary(res[0].url, path, request, response);
+            } else {
+                // we don't need to re-route, so look for a local route
+                switch (path) {
+                    case "/":
+                        displayHome(path, request, response);
+                        break;
+                    case "/goodbye":
+                        displayGoodbye(path, request, response);
+                        break;
+                    case "/style.css":
+                        sendStyles(path, request, response);
+                        break;
+                    case "/test.html":
+                        sendTestHTML(path, request, response);
+                        break;
+                    case "/redirecttest":
+                        redirectTest(path, request, response);
+                        break;
+                    default:
+                        error404Page(path, request, response);
+                }
+            }
+        });
     }
+}
+
+function redirectArbitrary(destination, path, req, res) {
+    if (destination.indexOf('https://') === -1) {
+        destination = 'https://' + destination;
+    }
+    console.log("~~~~~~~~~~~~~~~~~~~~~~");
+    console.log(`REDIRECTIN AWAY TO ${destination}`);
+    console.log("~~~~~~~~~~~~~~~~~~~~~~");
+    res.writeHead(302, {
+        'Location': destination
+    });
+    res.end();
+}
+
+
+function addUrlToDb(path, callback) {
+    cbdata = {};
+    // test for existance of path in db
+    // myUrl = new URL(path);
+    // console.log(`Original: ${path}; parsed: ${myUrl.href}`);
+    connection.query(`SELECT * FROM urls WHERE url = '${path}'`, (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) { // i.e. the URL exists
+            cbdata.message = "url already in db";
+            cbdata.success = false;
+            callback(cbdata);
+            return;
+        } else { // it doesn't already exist, so insert it
+            connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${"hmm" + Date.now() + "cheese" + path.length + path[0] + "oh"}');`, (err, res) => {
+                if (err) throw err;
+                console.log("Addddded!");
+                cbdata.message = "we good";
+                cbdata.success = true;
+                cbdata.url = path;
+                callback(cbdata);
+            });
+        }
+    });
 }
 
 function serverLog(path) {
@@ -56,7 +125,17 @@ function serverLog(path) {
         } else {
             console.log("Logging Complete.");
         }
-    })
+    });
+}
+
+function omniLog(text) {
+    fs.appendFile("serverLog.txt", text + "\n", (err) => {
+        if (err) {
+            console.log("error writing omniLog");
+        } else {
+            console.log(`${text} Logging Complete.`);
+        }
+    });
 }
 
 function displayHome(path, req, res) {
@@ -75,7 +154,7 @@ function displayHome(path, req, res) {
                 <p><a href="/notARealPage">This link will 404</a></p>
                 <p><a href="/goodbye">Goodbye</a></p>
                 <hr />
-                <form action="/test.html" method="post">
+                <form action="/addurl" method="post">
                     URL to make long:<br />
                     <input type="text" name="url"><br />
                     <input type="submit"></input>
@@ -100,12 +179,12 @@ function getUrlsFromDB(callback) {
         if (err) throw err;
         console.log(`DB url results length: ${res.length}`);
         urls = '<ul>'
-        for (let i = 0; i < res.length; i ++) {
+        for (let i = 0; i < res.length; i++) {
             urls += '<li>';
-            urls += res[0].url;
-            urls += " ";
-            urls += res[0].urlong;
-            urls += '</li>';
+            urls += res[i].url;
+            urls += ' --- <a href="/';
+            urls += res[i].urlong;
+            urls += '">URLong</a></li>';
         }
         urls += '</ul>';
         // urls = `<h1>Fake URLS</h1>`;
@@ -173,7 +252,7 @@ function sendTestHTML(path, req, res) {
 function redirectTest(path, req, res) {
     res.writeHead(302, {
         'Location': '/goodbye'
-      });
+    });
     res.end();
 }
 
