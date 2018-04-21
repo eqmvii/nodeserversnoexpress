@@ -5,7 +5,7 @@ const PORT = 4000;
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
     var path = request.url;
-    console.log(path);
+    console.log(`Path requested: ${path}`);
 
     switch (path) {
         case "/":
@@ -18,11 +18,12 @@ function handleRequest(request, response) {
             sendStyles(path, request, response);
             break;
         default:
-            response.end(`Default... ${request.url}`);
+            error404Page(path, request, response);
     }
 }
 
 function displayHome(path, req, res) {
+    console.log(res);
     var homeHTML = `
     <html>
         <head>
@@ -32,7 +33,8 @@ function displayHome(path, req, res) {
         <body>
             <h1>Hello World!</h1>
             <p>This is the root.</p>
-            <a href="/goodbye">Goodbye</a>
+            <p><a href="/notARealPage">This link will 404</a></p>
+            <p><a href="/goodbye">Goodbye</a></p>
         </body>
     </html>
     `;
@@ -50,7 +52,7 @@ function displayGoodbye(path, req, res) {
         <body>
             <h1>Goodbye World!</h1>
             <p>See you later!</p>
-            <a href="/">Return Home</a>
+            <p><a href="/">Return Home</a></p>
         </body>
     </html>
     `;
@@ -62,14 +64,33 @@ function sendStyles(path, req, res) {
     var styles = `
     body {
       color: blue;
+      font-family: monospace;
     }
 
-    h1 {
+    h1, p, a {
         text-align: center;
     }
     `;
     // res.writeHead(200, "content")
     res.end(styles);
+}
+
+function error404Page(path, req, res) {
+    var errorHTML = `
+    <html>
+        <head>
+            <link rel="stylesheet" type="text/css" href="style.css">
+            <title>404 Error - Page Not Fond</title>
+        </head>
+        <body>
+            <h1>404 Error - Page Not Found</h1>
+            <p>Couldn't find ${path} on server :( </p>
+            <p><a href="/">Return Home</a></p>
+        </body>
+    </html>
+    `;
+  res.writeHead(404, { "Content-Type": "text/html" });
+  res.end(errorHTML);
 }
 
 var server = http.createServer(handleRequest);
