@@ -1,7 +1,23 @@
 var http = require("http");
 var fs = require("fs");
+var mysql = require("mysql");
+
 
 const PORT = 4000;
+
+// sql connection
+var connection = mysql.createConnection({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "password", // so secure I know
+    database: "urlong_db"
+});
+
+connection.connect(function (err) {
+    if (err) throw err;
+    console.log(`MySQL DB connected as ${connection.threadId}`);
+});
 
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
