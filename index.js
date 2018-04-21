@@ -22,6 +22,7 @@ connection.connect(function (err) {
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
     var path = request.url;
+    console.log(`Request method: ${request.method}`);
     console.log(`Path requested: ${path}`);
     serverLog(path);
 
@@ -37,6 +38,9 @@ function handleRequest(request, response) {
             break;
         case "/test.html":
             sendTestHTML(path, request, response);
+            break;
+        case "/redirecttest":
+            redirectTest(path, request, response);
             break;
         default:
             error404Page(path, request, response);
@@ -67,6 +71,7 @@ function displayHome(path, req, res) {
                 <h1>Hello World!</h1>
                 <p>This is the root.</p>
                 <p><a href="/test.html">This will serve test.html</a></p>
+                <p><a href="/redirecttest">Redirect Test</a></p>
                 <p><a href="/notARealPage">This link will 404</a></p>
                 <p><a href="/goodbye">Goodbye</a></p>
                 <hr />
@@ -137,7 +142,6 @@ function sendStyles(path, req, res) {
         text-align: center;
     }
     `;
-    // res.writeHead(200, "content")
     res.end(styles);
 }
 
@@ -164,6 +168,13 @@ function sendTestHTML(path, req, res) {
         res.writeHead(200, { "Content-Type": "text/html" });
         res.end(data);
     });
+}
+
+function redirectTest(path, req, res) {
+    res.writeHead(302, {
+        'Location': '/goodbye'
+      });
+    res.end();
 }
 
 var server = http.createServer(handleRequest);
