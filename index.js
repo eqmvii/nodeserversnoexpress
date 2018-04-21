@@ -56,23 +56,56 @@ function serverLog(path) {
 }
 
 function displayHome(path, req, res) {
-    var homeHTML = `
-    <html>
-        <head>
-            <link rel="stylesheet" type="text/css" href="style.css">
-            <title>Node.js Server Testing</title>
-        </head>
-        <body>
-            <h1>Hello World!</h1>
-            <p>This is the root.</p>
-            <p><a href="/test.html">This will serve test.html</a></p>
-            <p><a href="/notARealPage">This link will 404</a></p>
-            <p><a href="/goodbye">Goodbye</a></p>
-        </body>
-    </html>
+    getUrlsFromDB((urls) => {
+        var homeHTML = `
+            <html>
+                <head>
+                    <link rel="stylesheet" type="text/css" href="style.css">
+                    <title>Node.js Server Testing</title>
+                </head>
+            <body>
+                <h1>Hello World!</h1>
+                <p>This is the root.</p>
+                <p><a href="/test.html">This will serve test.html</a></p>
+                <p><a href="/notARealPage">This link will 404</a></p>
+                <p><a href="/goodbye">Goodbye</a></p>
+                <hr />
+                <form action="/test.html" method="post">
+                    URL to make long:<br />
+                    <input type="text" name="url"><br />
+                    <input type="submit"></input>
+                </form>
+                <hr />
+                ${urls}
+                </body>
+        </html>
     `;
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end(homeHTML);
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end(homeHTML);
+
+    });
+
+}
+
+// connection.query('INSERT INTO songs (title, artist, genre) VALUES (?, ?, ?)', [answers.title, answers.artist, answers.genre], function () {
+
+
+function getUrlsFromDB(callback) {
+    connection.query("SELECT * FROM urls", (err, res) => {
+        if (err) throw err;
+        console.log(`DB url results length: ${res.length}`);
+        urls = '<ul>'
+        for (let i = 0; i < res.length; i ++) {
+            urls += '<li>';
+            urls += res[0].url;
+            urls += " ";
+            urls += res[0].urlong;
+            urls += '</li>';
+        }
+        urls += '</ul>';
+        // urls = `<h1>Fake URLS</h1>`;
+        callback(urls);
+    });
 }
 
 function displayGoodbye(path, req, res) {
@@ -100,7 +133,7 @@ function sendStyles(path, req, res) {
       font-family: monospace;
     }
 
-    h1, p, a {
+    h1, p, a, ul {
         text-align: center;
     }
     `;
@@ -122,12 +155,12 @@ function error404Page(path, req, res) {
         </body>
     </html>
     `;
-  res.writeHead(404, { "Content-Type": "text/html" });
-  res.end(errorHTML);
+    res.writeHead(404, { "Content-Type": "text/html" });
+    res.end(errorHTML);
 }
 
 function sendTestHTML(path, req, res) {
-    fs.readFile(__dirname + "/test.html", function(err, data) {
+    fs.readFile(__dirname + "/test.html", function (err, data) {
         res.writeHead(200, { "Content-Type": "text/html" });
         res.end(data);
     });
