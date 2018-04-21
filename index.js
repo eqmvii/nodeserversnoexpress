@@ -104,7 +104,8 @@ function addUrlToDb(path, callback) {
             callback(cbdata);
             return;
         } else { // it doesn't already exist, so insert it
-            connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${"hmm" + Date.now() + "cheese" + path.length + path[0] + "oh"}');`, (err, res) => {
+            // connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${"hmm" + Date.now() + "cheese" + path.length + path[0] + "oh"}');`, (err, res) => {
+            connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${urlongify(path)}');`, (err, res) => {
                 if (err) throw err;
                 console.log("Addddded!");
                 cbdata.message = "we good";
@@ -114,6 +115,22 @@ function addUrlToDb(path, callback) {
             });
         }
     });
+}
+
+function urlongify(shortPath) {
+    var longPath = "urlong";
+    if(shortPath.length > 1000) {
+        console.log("Woah that's already crazy long");
+        return longPath + Date.now() + shortPath;
+    }
+    for (let i = 0; i < 400; i++) {
+        longPath += Math.floor((Math.random() * 10));
+    }
+    longPath += Date.now();
+    for (let i = 0; i < 600; i++) {
+        longPath += Math.floor((Math.random() * 10));
+    }
+    return longPath;
 }
 
 function serverLog(path) {
