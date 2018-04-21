@@ -1,4 +1,5 @@
 var http = require("http");
+var fs = require("fs");
 
 const PORT = 4000;
 
@@ -17,6 +18,9 @@ function handleRequest(request, response) {
         case "/style.css":
             sendStyles(path, request, response);
             break;
+        case "/test.html":
+            sendTestHTML(path, request, response);
+            break;
         default:
             error404Page(path, request, response);
     }
@@ -33,6 +37,7 @@ function displayHome(path, req, res) {
         <body>
             <h1>Hello World!</h1>
             <p>This is the root.</p>
+            <p><a href="/test.html">This will serve test.html</a></p>
             <p><a href="/notARealPage">This link will 404</a></p>
             <p><a href="/goodbye">Goodbye</a></p>
         </body>
@@ -91,6 +96,14 @@ function error404Page(path, req, res) {
     `;
   res.writeHead(404, { "Content-Type": "text/html" });
   res.end(errorHTML);
+}
+
+function sendTestHTML(path, req, res) {
+    fs.readFile(__dirname + "/test.html", function(err, data) {
+        console.log(data);
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end(data);
+    });
 }
 
 var server = http.createServer(handleRequest);
