@@ -7,6 +7,7 @@ const PORT = 4000;
 function handleRequest(request, response) {
     var path = request.url;
     console.log(`Path requested: ${path}`);
+    serverLog(path);
 
     switch (path) {
         case "/":
@@ -26,8 +27,19 @@ function handleRequest(request, response) {
     }
 }
 
+function serverLog(path) {
+    var now = new Date();
+    var logText = "Request at " + now.toLocaleDateString() + " " + now.toLocaleTimeString() + ": " + path + "\n";
+    fs.appendFile("serverLog.txt", logText, (err) => {
+        if (err) {
+            console.log("error writing logs");
+        } else {
+            console.log("Logging Complete.");
+        }
+    })
+}
+
 function displayHome(path, req, res) {
-    console.log(res);
     var homeHTML = `
     <html>
         <head>
@@ -100,7 +112,6 @@ function error404Page(path, req, res) {
 
 function sendTestHTML(path, req, res) {
     fs.readFile(__dirname + "/test.html", function(err, data) {
-        console.log(data);
         res.writeHead(200, { "Content-Type": "text/html" });
         res.end(data);
     });
