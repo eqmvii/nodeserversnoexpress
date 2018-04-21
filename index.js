@@ -33,8 +33,8 @@ function handleRequest(request, response) {
         }).on('end', () => {
             body = Buffer.concat(body).toString();
             console.log(`Original post body: ${body}`);
-            var postUrl = body.split("=")[1].replace(/\+/g, " ").replace(/\%2F/g, "/").replace(/\%3A/g, ":");
-            console.log(`Decoded: ${decodeURI(postUrl)}`);
+            var postUrl = decodeURIComponent(body.split("=")[1].replace(/\+/g, " ")); //.replace(/\%2F/g, "/").replace(/\%3A/g, ":");
+            console.log(`Acshual: ${postUrl}`);
             // console.log(`Das YouAreEL: ${myUrl.toString()}`);
             console.log(postUrl)
             omniLog(`POST of URL ${postUrl}`);
@@ -154,13 +154,16 @@ function displayHome(path, req, res) {
                 <p><a href="/notARealPage">This link will 404</a></p>
                 <p><a href="/goodbye">Goodbye</a></p>
                 <hr />
-                <form action="/addurl" method="post">
+                <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
                     URL to make long:<br />
                     <input type="text" name="url"><br />
                     <input type="submit"></input>
                 </form>
                 <hr />
                 ${urls}
+                <hr />
+                <p>Coming later: delete all links button</p>
+                <p>Shamefully made by eqmvii</p>
                 </body>
         </html>
     `;

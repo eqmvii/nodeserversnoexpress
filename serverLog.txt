@@ -418,3 +418,62 @@ Request at 2018-4-21 17:57:56: /style.css
 Request at 2018-4-21 17:58:00: /hmm1524347874915cheese158hoh
 Request at 2018-4-21 17:58:10: /
 Request at 2018-4-21 17:58:10: /style.css
+Request at 2018-4-21 18:01:58: /
+Request at 2018-4-21 18:01:58: /style.css
+Request at 2018-4-21 18:02:11: /
+Request at 2018-4-21 18:02:11: /style.css
+Request at 2018-4-21 18:02:27: /addurl
+POST of URL https://imgur.com/js2qX42
+Request at 2018-4-21 18:02:27: /goodbye
+Request at 2018-4-21 18:02:27: /style.css
+Request at 2018-4-21 18:02:29: /
+Request at 2018-4-21 18:02:29: /style.css
+Request at 2018-4-21 18:02:35: /hmm1524348147943cheese25hoh
+Request at 2018-4-21 18:47:17: /
+Request at 2018-4-21 18:47:17: /style.css
+Request at 2018-4-21 18:47:17: /favicon.ico
+Request at 2018-4-21 18:47:22: /hmm1524348147943cheese25hoh
+Request at 2018-4-21 18:47:30: /addurl
+POST of URL https://reddit.com/r/cscareerquestions
+Request at 2018-4-21 18:47:30: /goodbye
+Request at 2018-4-21 18:47:30: /style.css
+Request at 2018-4-21 18:47:32: /
+Request at 2018-4-21 18:47:32: /style.css
+Request at 2018-4-21 18:47:36: /hmm1524350850229cheese38hoh
+Request at 2018-4-21 18:47:48: /
+Request at 2018-4-21 18:47:48: /style.css
+Request at 2018-4-21 18:47:50: /addurl
+POST of URL https://www.cnn.com/2018/04/21/politics/trump-cohen-new-york-times/index.html
+Request at 2018-4-21 18:47:50: /goodbye
+Request at 2018-4-21 18:47:50: /style.css
+Request at 2018-4-21 18:47:52: /
+Request at 2018-4-21 18:47:52: /style.css
+Request at 2018-4-21 18:47:55: /hmm1524350870701cheese77hoh
+Request at 2018-4-21 18:48:06: /
+Request at 2018-4-21 18:48:06: /style.css
+Request at 2018-4-21 18:48:09: /addurl
+POST of URL https://www.google.com/search%3Fsafe%3Doff%26source%3Dhp%26ei%3Dnb_bWq_mK-7R5gKWl7fIDQ%26q%3Dwalrus%26oq%3Dwalrus%26gs_l%3Dpsy-ab.3..0j0i131k1j0l4j0i131i46k1j46i131k1l3j0l3.531.1103.0.1224.7.6.0.0.0.0.99.450.6.6.0....0...1.1.64.psy-ab..1.6.449.0...0.7sbrq0R5JYk
+Request at 2018-4-21 18:48:09: /goodbye
+Request at 2018-4-21 18:48:09: /style.css
+Request at 2018-4-21 18:48:11: /
+Request at 2018-4-21 18:48:11: /style.css
+Request at 2018-4-21 18:48:22: /hmm1524350889409cheese261hoh
+Request at 2018-4-21 18:49:29: /
+Request at 2018-4-21 18:49:29: /style.css
+Request at 2018-4-21 18:49:35: /
+Request at 2018-4-21 18:49:35: /style.css
+Request at 2018-4-21 18:49:37: /addurl
+POST of URL https://www.google.com/search%3Fsafe%3Doff%26ei%3Dn7_bWtz6GMrX5gLuvpXICA%26q%3Dwalrus6%26oq%3Dwalrus6%26gs_l%3Dpsy-ab.3..0i8i13i30k1l6j0i8i13i10i30k1j0i8i13i30k1j0i13i30k1j0i8i13i10i30k1.84050.84050.0.84299.1.1.0.0.0.0.114.114.0j1.1.0....0...1.1.64.psy-ab..0.1.112....0.OjkvmPsV73c
+Request at 2018-4-21 18:49:37: /goodbye
+Request at 2018-4-21 18:49:37: /style.css
+Request at 2018-4-21 18:49:39: /
+Request at 2018-4-21 18:49:39: /style.css
+Request at 2018-4-21 18:51:07: /
+Request at 2018-4-21 18:51:07: /style.css
+Request at 2018-4-21 18:51:09: /addurl
+POST of URL https://www.google.com/search?safe=off&source=hp&ei=UcDbWtqNH4ab_QbwxZzwAg&q=walrus+times+10&oq=walrus+times+10&gs_l=psy-ab.3...1321.2570.0.2704.16.14.0.0.0.0.172.1421.2j10.12.0....0...1.1.64.psy-ab..4.11.1311.0..0j0i131k1j0i131i46k1j46i131k1j0i22i30k1.0.3-AMotVRYD4
+Request at 2018-4-21 18:51:09: /goodbye
+Request at 2018-4-21 18:51:09: /style.css
+Request at 2018-4-21 18:51:11: /
+Request at 2018-4-21 18:51:11: /style.css
+Request at 2018-4-21 18:51:15: /hmm1524351069823cheese266hoh
