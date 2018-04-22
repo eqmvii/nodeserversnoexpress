@@ -56,7 +56,7 @@ function handleRequest(request, response) {
                 serverLog("Error checking for server route");
                 serverLog(err);
             }
-            if (res.length > 0) { // i.e. the URL exists
+            if (!err && res.length > 0) { // i.e. the URL exists
                 console.log(`Exists! Should redirect to ${res[0].url}`);
                 redirectArbitrary(res[0].url, path, request, response);
             } else {
