@@ -64,7 +64,7 @@ function createTableIfNecessary() {
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
     console.log(`Host: ${request.host}`);
-    console.log(request);
+    // console.log(request);
     var path = request.url;
     console.log(`Request method: ${request.method}; Path requested: ${path}`);
     serverLog(path);
