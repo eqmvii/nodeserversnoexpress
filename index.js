@@ -31,7 +31,30 @@ connection.connect(function (err) {
         serverLog(err);
     }
     console.log(`MySQL DB connected as ${connection.threadId}`);
+    createTableIfNecessary();
 });
+
+function createTableIfNecessary() {
+    connection.query(`SELECT * FROM urls`, (err, res) => {
+        if (err) {
+            // create the table
+            connection.query(`CREATE TABLE urls (
+                id INT NOT NULL AUTO_INCREMENT,
+                url VARCHAR(2100) NULL,
+                urlong VARCHAR(2100) NULL,
+                PRIMARY KEY (id)
+              );
+              `, (err, res) => {
+                    if (err) {
+                        console.log("This was always too dumb to work, and it didn't.");
+                        console.log(err);
+                    } else {
+                        console.log("This was incredibly dumb but it actually worked!");
+                    }
+                });
+        }
+    });
+}
 
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
