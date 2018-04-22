@@ -6,6 +6,8 @@ var mysql = require("mysql");
 
 
 const PORT = process.env.PORT || 4000; // prep for Heroku deployment
+const HEARTBEAT = 3; // number of seconds to wait between DB pings to keep the connection alive
+var age = 0;
 var appRoot;
 
 // sql connection
@@ -43,6 +45,13 @@ function turnOn(cb) {
         }
         console.log(`### MySQL DB connected as ${connection.threadId} ###`);
         createTableIfNecessary(() => {
+            setInterval(() => {
+                age++;
+                if (( age % (30 / HEARTBEAT) ) === 0) {
+                    console.log(`Another 30 seconds has passed. I am still dumby querying the DB every ${HEARTBEAT} seconds. ${age} times so far.\nOmg this is so hacky.`);
+                }
+                connection.query('SELECT 1');
+            }, HEARTBEAT * 1000);
             cb();
         });
     });
