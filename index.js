@@ -6,13 +6,23 @@ var mysql = require("mysql");
 const PORT = process.env.PORT || 4000; // prep for Heroku deployment
 
 // sql connection
-var connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "password", // so secure I know
-    database: "urlong_db"
-});
+var connection;
+if (process.env.PORT) {
+    connection = mysql.createConnection({
+        host: "us-cdbr-iron-east-05.cleardb.net",
+        user: "b9f6ab3105475d",
+        password: "b9e3acac",
+        database: "heroku_9771ee7f2284234"
+    });
+} else {
+    connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password", // so secure I know
+        database: "urlong_db"
+    });
+}
 
 connection.connect(function (err) {
     if (err) {
@@ -139,7 +149,7 @@ function addUrlToDb(path, callback) {
 
 function urlongify(shortPath) {
     var longPath = "urlong";
-    if(shortPath.length > 1000) {
+    if (shortPath.length > 1000) {
         console.log("Woah that's already crazy long");
         return longPath + Date.now() + shortPath;
     }
