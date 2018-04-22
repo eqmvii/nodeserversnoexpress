@@ -110,6 +110,7 @@ function addUrlToDb(path, callback) {
             serverLog("Error checking URL before adding to db");
             serverLog(err);
             callback({});
+            return;
         }
         if (res.length > 0) { // i.e. the URL exists
             cbdata.message = "url already in db";
@@ -124,6 +125,7 @@ function addUrlToDb(path, callback) {
                     serverLog("Error inserting URL to db");
                     serverLog(err);
                     callback({});
+                    return;
                 }
                 console.log("Addddded!");
                 cbdata.message = "we good";
@@ -219,6 +221,7 @@ function getUrlsFromDB(callback) {
             serverLog("Error looking for URL in DB");
             serverLog(err);
             callback({});
+            return;
         }
         console.log(`DB url results length: ${res.length}`);
         urls = '<ul style="list-style-type: none; margin: 0; padding: 0">'
