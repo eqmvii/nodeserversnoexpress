@@ -1,3 +1,5 @@
+// TODO NEXT: Add end connection logic and make DB connections depend on it each time
+
 var http = require("http");
 var fs = require("fs");
 var mysql = require("mysql");
@@ -29,17 +31,29 @@ if (process.env.PORT) {
     appRoot = `http://localhost:4000/`;
 }
 
-connection.connect(function (err) {
-    if (err) {
-        console.log("Error connection to DB...");
-        serverLog("Error connecting to DB :(");
-        serverLog(err);
-    }
-    console.log(`MySQL DB connected as ${connection.threadId}`);
-    createTableIfNecessary();
+function turnOn(cb) {
+    connection.connect(function (err) {
+        if (err) {
+            console.log("Error connection to DB...");
+            serverLog("Error connecting to DB :(");
+            serverLog(err);
+            cb();
+            return;
+        }
+        console.log(`MySQL DB connected as ${connection.threadId}`);
+        createTableIfNecessary(() => {
+            cb();
+        });
+    });
+}
+
+// for local testing; leave the connection on
+turnOn(() => {
+    console.log("I got turned on and nothing happened");
 });
 
-function createTableIfNecessary() {
+
+function createTableIfNecessary(cb) {
     connection.query(`SELECT * FROM urls`, (err, res) => {
         if (err) {
             // create the table
@@ -58,13 +72,16 @@ function createTableIfNecessary() {
                     }
                 });
         }
+        cb();
     });
 }
 
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
-    console.log(`Host: ${request.host}`);
-    // console.log(request);
+    finishRequest(request, response);
+}
+
+function finishRequest(request, response) {
     var path = request.url;
     console.log(`Request method: ${request.method}; Path requested: ${path}`);
     serverLog(path);
