@@ -18,6 +18,7 @@ connection.connect(function (err) {
     if (err) {
         console.log("Error connection to DB...");
         serverLog("Error connecting to DB :(");
+        serverLog(err);
     }
     console.log(`MySQL DB connected as ${connection.threadId}`);
 });
@@ -50,7 +51,11 @@ function handleRequest(request, response) {
         // test for re-routing
         var chunk = path.substring(1, path.length);
         connection.query(`SELECT * FROM urls WHERE urlong = '${chunk}'`, (err, res) => {
-            if (err) throw err;
+            if (err) {
+                console.log("Error testing for a URL route");
+                serverLog("Error checking for server route");
+                serverLog(err);
+            }
             if (res.length > 0) { // i.e. the URL exists
                 console.log(`Exists! Should redirect to ${res[0].url}`);
                 redirectArbitrary(res[0].url, path, request, response);
@@ -100,7 +105,12 @@ function addUrlToDb(path, callback) {
     // myUrl = new URL(path);
     // console.log(`Original: ${path}; parsed: ${myUrl.href}`);
     connection.query(`SELECT * FROM urls WHERE url = '${path}'`, (err, res) => {
-        if (err) throw err;
+        if (err) {
+            console.log("Error checking URL before adding to db");
+            serverLog("Error checking URL before adding to db");
+            serverLog(err);
+            callback({});
+        }
         if (res.length > 0) { // i.e. the URL exists
             cbdata.message = "url already in db";
             cbdata.success = false;
@@ -109,7 +119,12 @@ function addUrlToDb(path, callback) {
         } else { // it doesn't already exist, so insert it
             // connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${"hmm" + Date.now() + "cheese" + path.length + path[0] + "oh"}');`, (err, res) => {
             connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${urlongify(path)}');`, (err, res) => {
-                if (err) throw err;
+                if (err) {
+                    console.log("Error inserting URL to db");
+                    serverLog("Error inserting URL to db");
+                    serverLog(err);
+                    callback({});
+                }
                 console.log("Addddded!");
                 cbdata.message = "we good";
                 cbdata.success = true;
@@ -199,7 +214,12 @@ function displayHome(path, req, res) {
 
 function getUrlsFromDB(callback) {
     connection.query("SELECT * FROM urls", (err, res) => {
-        if (err) throw err;
+        if (err) {
+            console.log("Error looking for URL in DB");
+            serverLog("Error looking for URL in DB");
+            serverLog(err);
+            callback({});
+        }
         console.log(`DB url results length: ${res.length}`);
         urls = '<ul style="list-style-type: none; margin: 0; padding: 0">'
         for (let i = 0; i < res.length; i++) {
