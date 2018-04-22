@@ -4,6 +4,7 @@ var mysql = require("mysql");
 
 
 const PORT = process.env.PORT || 4000; // prep for Heroku deployment
+var appRoot;
 
 // sql connection
 var connection;
@@ -14,6 +15,9 @@ if (process.env.PORT) {
         password: "b9e3acac",
         database: "heroku_9771ee7f2284234"
     });
+    console.log("CONNECTION:");
+    console.log(connection);
+    appRoot = `https://urlong.herokuapp.com`;
 } else {
     connection = mysql.createConnection({
         host: "localhost",
@@ -22,6 +26,7 @@ if (process.env.PORT) {
         password: "password", // so secure I know
         database: "urlong_db"
     });
+    appRoot = `http://localhost:4000/`;
 }
 
 connection.connect(function (err) {
@@ -58,6 +63,8 @@ function createTableIfNecessary() {
 
 // Callback handling the request from the server and logging the URL hit
 function handleRequest(request, response) {
+    console.log(`Host: ${request.host}`);
+    console.log(request);
     var path = request.url;
     console.log(`Request method: ${request.method}; Path requested: ${path}`);
     serverLog(path);
@@ -171,7 +178,7 @@ function addUrlToDb(path, callback) {
 }
 
 function urlongify(shortPath) {
-    var longPath = "urlong";
+    var longPath = "";
     if (shortPath.length > 1000) {
         console.log("Woah that's already crazy long");
         return longPath + Date.now() + shortPath;
@@ -179,6 +186,7 @@ function urlongify(shortPath) {
     for (let i = 0; i < 400; i++) {
         longPath += Math.floor((Math.random() * 10));
     }
+    longPath += `urlong`;
     longPath += Date.now();
     for (let i = 0; i < 600; i++) {
         longPath += Math.floor((Math.random() * 10));
@@ -259,11 +267,11 @@ function getUrlsFromDB(callback) {
         console.log(`DB url results length: ${res.length}`);
         urls = '<ul style="list-style-type: none; margin: 0; padding: 0">'
         for (let i = 0; i < res.length; i++) {
-            urls += '<li style="word-wrap: break-word">';
+            urls += `<li style="word-wrap: break-word">${appRoot}`;
             urls += res[i].urlong;
-            urls += '</li><li>^ ^ ^ ^ ^ ^<a href="/';
+            urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
             urls += res[i].urlong;
-            urls += '">URLong</a>^ ^ ^ ^ ^ ^</li>';
+            urls += '">URLong</a> ^ ^ ^ ^ ^ ^</li>';
         }
         urls += '</ul><br />';
         // urls = `<h1>Fake URLS</h1>`;
@@ -298,6 +306,10 @@ function sendStyles(path, req, res) {
 
     h1, p, a, ul {
         text-align: center;
+    }
+
+    li {
+        padding-bottom: 12px;
     }
     `;
     res.end(styles);
