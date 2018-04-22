@@ -292,7 +292,7 @@ function displayHome(path, req, res) {
             <html>
                 <head>
                     <link rel="stylesheet" type="text/css" href="style.css">
-                    <title>Node.js Server Testing</title>
+                    <title>URLong</title>
                 </head>
             <body>
                 <h1>URLong</h1>
