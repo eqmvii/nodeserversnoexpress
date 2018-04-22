@@ -1,17 +1,32 @@
-// TODO NEXT: Make the redirect display the correct urlong
+/*
+ *  index.js
+ *  Contains the entire URLong app, including html and css, in one file
+ *  Because... why not?
+ *  by Eric Mancini launched 4/22/2018
+ *  https://github.com/eqmvii/urlong
+ */
+
+
+//
+// CONFIGURATION
+//
 
 var http = require("http");
 var fs = require("fs");
 var mysql = require("mysql");
-
 
 const PORT = process.env.PORT || 4000; // prep for Heroku deployment
 const HEARTBEAT = 3; // number of seconds to wait between DB pings to keep the connection alive
 var age = 0;
 var appRoot;
 
-// sql connection
+
+//
+// SQL connection
+//
+
 var connection;
+
 if (process.env.PORT) {
     connection = mysql.createConnection({
         host: "us-cdbr-iron-east-05.cleardb.net",
@@ -32,6 +47,24 @@ if (process.env.PORT) {
     });
     appRoot = `http://localhost:4000`;
 }
+
+
+//
+// INITIALIZATION
+//
+
+turnOn(() => {
+    console.log("I connected to the DB and nothing bad probably happened");
+    var server = http.createServer(handleRequest);
+    server.listen(PORT, function () {
+        console.log(`Server #1 is up and listening: http://localhost: ${PORT}`);
+    });
+});
+
+
+//
+// FUNCTIONS
+//
 
 function turnOn(cb) {
     console.log(`### Connecting... ###`);
@@ -56,20 +89,6 @@ function turnOn(cb) {
         });
     });
 }
-
-// Deprecated
-function turnOff() {
-    connection.end((err) => {
-        if (err) { console.log("Error closing..."); console.log(err); }
-        else { console.log(`### Connection ${connection.threadId} closed ###`); }
-    });
-}
-
-// for local testing; leave the connection on
-turnOn(() => {
-    console.log("I got turned on and nothing bad probably happened");
-});
-
 
 function createTableIfNecessary(cb) {
     connection.query(`SELECT * FROM urls`, (err, res) => {
@@ -102,6 +121,7 @@ function deleteAll() {
 }
 
 // Pointless middleware due to early confusion
+// TODO: Remove this
 function handleRequest(request, response) {
     finishRequest(request, response);
 }
@@ -144,7 +164,7 @@ function finishRequest(request, response) {
                 redirectArbitrary(res[0].url, path, request, response);
             } else {
                 // we don't need to re-route, so look for a local route
-                switch (path) {
+                switch (path) { // TODO: Move to its own function
                     case "/":
                         displayHome(path, request, response);
                         break;
@@ -184,7 +204,6 @@ function redirectArbitrary(destination, path, req, res) {
     });
     res.end();
 }
-
 
 function addUrlToDb(path, callback) {
     cbdata = {};
@@ -276,7 +295,7 @@ function displayHome(path, req, res) {
                     <title>Node.js Server Testing</title>
                 </head>
             <body>
-                <h1>Urlong</h1>
+                <h1>URLong</h1>
                 <h3>A URL elongator</h3>
                 <!--<p>This is the root.</p>
                 <p><a href="/test.html">This will serve test.html</a></p>
@@ -287,7 +306,7 @@ function displayHome(path, req, res) {
                     <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
                         <h3>URL to make long:</h3>
                         <input type="text" name="url"><br />
-                        <button type="submit">urlongify</button>
+                        <button type="submit">URLongify</button>
                     </form>
                 </div>
                 <br />
@@ -295,8 +314,8 @@ function displayHome(path, req, res) {
                 ${urls}
                 <br />
                 <hr />
-                <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all urlongs from the DB</a></p>
-                <p>Shamefully made by eqmvii</p>
+                <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all URLongs from the DB</a></p>
+                <p>Shamefully made by <a href="https://github.com/eqmvii/urlong">eqmvii</a></p>
                 </body>
         </html>
     `;
@@ -310,7 +329,7 @@ function urlongResults(results, path, req, res) {
         <html>
             <head>
                 <link rel="stylesheet" type="text/css" href="style.css">
-                <title>Urlonging Results</title>
+                <title>URLonging Results</title>
             </head>
             <body>
                 <script>
@@ -323,8 +342,8 @@ function urlongResults(results, path, req, res) {
                     statusNode.textContent = "urlong copied to your clipboard!";
                   }
                 </script>
-                <h1>Urlonged</h1>
-                <h3>You made a urlong</h3>
+                <h1>URLonged</h1>
+                <h3>You made a URLong</h3>
                 <div class="theform">
                     <p><a href="${results.urlong}">Test Your URLong</a></p>
                     <p><strong>Success:</strong> ${results.success}</p>
@@ -362,7 +381,7 @@ function getUrlsFromDB(callback) {
             urls += res[i].urlong;
             urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
             urls += res[i].urlong;
-            urls += '">URLong</a> ^ ^ ^ ^ ^ ^</li>';
+            urls += '">Test This URLong</a> ^ ^ ^ ^ ^ ^</li>';
         }
         urls += '</ul><br />';
         // urls = `<h1>Fake URLS</h1>`;
@@ -375,7 +394,7 @@ function displayGoodbye(path, req, res) {
     <html>
         <head>
             <link rel="stylesheet" type="text/css" href="style.css">
-            <title>Urlonged!</title>
+            <title>URLonged!</title>
         </head>
         <body>
             <h1>Thanks for making a long URL!</h1>
@@ -467,7 +486,7 @@ function error404Page(path, req, res) {
         <body>
             <h1>404 Error - Page Not Found</h1>
             <p>Couldn't find ${path} on server :( </p>
-            <p>I hope it's not a broken urlong!</p>
+            <p>I hope it's not a broken URLong!</p>
             <p>It might be :(</p>
             <p><a href="/">Return Home</a></p>
         </body>
@@ -491,8 +510,10 @@ function redirectTest(path, req, res) {
     res.end();
 }
 
-var server = http.createServer(handleRequest);
-
-server.listen(PORT, function () {
-    console.log(`Server #1 is up and listening: http://localhost: ${PORT}`);
-});
+// Deprecated
+function turnOff() {
+    connection.end((err) => {
+        if (err) { console.log("Error closing..."); console.log(err); }
+        else { console.log(`### Connection ${connection.threadId} closed ###`); }
+    });
+}
