@@ -32,6 +32,7 @@ if (process.env.PORT) {
 }
 
 function turnOn(cb) {
+    console.log(`### Connecting... ###`);
     connection.connect(function (err) {
         if (err) {
             console.log("Error connection to DB...");
@@ -40,16 +41,24 @@ function turnOn(cb) {
             cb();
             return;
         }
-        console.log(`MySQL DB connected as ${connection.threadId}`);
+        console.log(`### MySQL DB connected as ${connection.threadId} ###`);
         createTableIfNecessary(() => {
             cb();
         });
     });
 }
 
+// Deprecated
+function turnOff() {
+    connection.end((err) => {
+        if(err) { console.log("Error closing..."); console.log(err); }
+        else { console.log(`### Connection ${connection.threadId} closed ###`);}
+    });
+}
+
 // for local testing; leave the connection on
 turnOn(() => {
-    console.log("I got turned on and nothing happened");
+    console.log("I got turned on and nothing bad probably happened");
 });
 
 
@@ -76,7 +85,7 @@ function createTableIfNecessary(cb) {
     });
 }
 
-// Callback handling the request from the server and logging the URL hit
+// Pointless middleware due to early confusion
 function handleRequest(request, response) {
     finishRequest(request, response);
 }
