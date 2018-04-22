@@ -1,7 +1,5 @@
-# Node.js Servers Without Express
+# urlong - a URL elongator
 
-Creating some siple servers without using Express. Exciting!
+In case your URL is too short for your liking!
 
-# Maybe actually it's a URL elongator?
-
-We shall see...
+[https://urlong.herokuapp.com/](https://urlong.herokuapp.com/)
