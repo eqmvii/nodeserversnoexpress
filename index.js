@@ -1,4 +1,4 @@
-// TODO NEXT: Add end connection logic and make DB connections depend on it each time
+// TODO NEXT: Make the redirect display the correct urlong
 
 var http = require("http");
 var fs = require("fs");
@@ -47,7 +47,7 @@ function turnOn(cb) {
         createTableIfNecessary(() => {
             setInterval(() => {
                 age++;
-                if (( age % (30 / HEARTBEAT) ) === 0) {
+                if ((age % (30 / HEARTBEAT)) === 0) {
                     console.log(`Another 30 seconds has passed. I am still dumby querying the DB every ${HEARTBEAT} seconds. ${age} times so far.\nOmg this is so hacky.`);
                 }
                 connection.query('SELECT 1');
@@ -60,8 +60,8 @@ function turnOn(cb) {
 // Deprecated
 function turnOff() {
     connection.end((err) => {
-        if(err) { console.log("Error closing..."); console.log(err); }
-        else { console.log(`### Connection ${connection.threadId} closed ###`);}
+        if (err) { console.log("Error closing..."); console.log(err); }
+        else { console.log(`### Connection ${connection.threadId} closed ###`); }
     });
 }
 
@@ -94,6 +94,13 @@ function createTableIfNecessary(cb) {
     });
 }
 
+function deleteAll() {
+    connection.query(`DELETE FROM urls`, (err, res) => {
+        console.log("Deleted all urls");
+        serverLog("Deleted all urls");
+    });
+}
+
 // Pointless middleware due to early confusion
 function handleRequest(request, response) {
     finishRequest(request, response);
@@ -119,7 +126,8 @@ function finishRequest(request, response) {
             omniLog(`POST of URL ${postUrl}`);
             addUrlToDb(postUrl, (results) => {
                 console.log(results);
-                redirectTest(path, request, response);
+                urlongResults(results, path, request, response);
+                // redirectTest(path, request, response);
             });
         });
     } else { // so it's a GET
@@ -152,6 +160,10 @@ function finishRequest(request, response) {
                     case "/redirecttest":
                         redirectTest(path, request, response);
                         break;
+                    case "/thisisthesecretdeleteallfromthetableurl":
+                        deleteAll();
+                        displayHome(path, request, response);
+                        break;
                     default:
                         error404Page(path, request, response);
                 }
@@ -161,7 +173,7 @@ function finishRequest(request, response) {
 }
 
 function redirectArbitrary(destination, path, req, res) {
-    if (destination.indexOf('https://') === -1) {
+    if (destination.indexOf('https://') === -1 && destination.indexOf('http://') === -1) {
         destination = 'https://' + destination;
     }
     console.log("~~~~~~~~~~~~~~~~~~~~~~");
@@ -190,11 +202,14 @@ function addUrlToDb(path, callback) {
         if (res.length > 0) { // i.e. the URL exists
             cbdata.message = "url already in db";
             cbdata.success = false;
+            cbdata.url = res[0].url;
+            cbdata.urlong = res[0].urlong;
             callback(cbdata);
             return;
         } else { // it doesn't already exist, so insert it
             // connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${"hmm" + Date.now() + "cheese" + path.length + path[0] + "oh"}');`, (err, res) => {
-            connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${urlongify(path)}');`, (err, res) => {
+            var tempUrlong = urlongify(path);
+            connection.query(`INSERT INTO urls (url, urlong) VALUES ('${path}', '${tempUrlong}');`, (err, res) => {
                 if (err) {
                     console.log("Error inserting URL to db");
                     serverLog("Error inserting URL to db");
@@ -206,6 +221,7 @@ function addUrlToDb(path, callback) {
                 cbdata.message = "we good";
                 cbdata.success = true;
                 cbdata.url = path;
+                cbdata.urlong = tempUrlong;
                 callback(cbdata);
             });
         }
@@ -279,20 +295,56 @@ function displayHome(path, req, res) {
                 ${urls}
                 <br />
                 <hr />
-                <p>Coming later: delete all links button</p>
+                <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all urlongs from the DB</a></p>
                 <p>Shamefully made by eqmvii</p>
                 </body>
         </html>
     `;
         res.writeHead(200, { "Content-Type": "text/html" });
         res.end(homeHTML);
-
     });
-
 }
 
-// connection.query('INSERT INTO songs (title, artist, genre) VALUES (?, ?, ?)', [answers.title, answers.artist, answers.genre], function () {
-
+function urlongResults(results, path, req, res) {
+    var URLongHTML = `
+        <html>
+            <head>
+                <link rel="stylesheet" type="text/css" href="style.css">
+                <title>Urlonging Results</title>
+            </head>
+            <body>
+                <script>
+                function copyText() {
+                    var urlongNode = document.getElementById("theurlong");
+                    urlongNode.select();
+                    document.execCommand("Copy");
+                    // alert("Copied the text: " + urlongNode.value);
+                    var statusNode = document.getElementById("statusMsg");
+                    statusNode.textContent = "urlong copied to your clipboard!";
+                  }
+                </script>
+                <h1>Urlonged</h1>
+                <h3>You made a urlong</h3>
+                <div class="theform">
+                    <p><a href="${results.urlong}">Test Your URLong</a></p>
+                    <p><strong>Success:</strong> ${results.success}</p>
+                    <p><strong>Msg:</strong> ${results.message}</p>
+                    <p><strong>Original URL:</strong></p>
+                    <p>${results.url}</p>
+                    <p><strong>URLong:</strong></p>
+                    <textarea type="text" id="theurlong" style="text-align: left" value="${appRoot + "/" + results.urlong}">${appRoot + "/" + results.urlong}</textarea>
+                    <p><button onClick="copyText()">Copy URLong to clipboard</button></p>
+                    <p id="statusMsg"></p>
+                </div>
+                <hr />
+                <p>See you later!</p>
+                <p><a href="/">Return Home</a></p>
+            </body>
+        </html>
+        `;
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(URLongHTML);
+}
 
 function getUrlsFromDB(callback) {
     connection.query("SELECT * FROM urls", (err, res) => {
@@ -341,6 +393,7 @@ function sendStyles(path, req, res) {
     body {
       color: blue;
       font-family: monospace;
+      font-size: 14px;
     }
 
     h1, h3, p, a, ul {
@@ -363,9 +416,12 @@ function sendStyles(path, req, res) {
         background-color: white;
         color: blue;
         border-radius: 5px;
-        height: 2.5em;
+        height: 3.5em;
         width: 20%;
         font-weight: bold;
+        padding: 6px;
+        margin-top: 6px;
+
     }
 
     button:hover {
@@ -380,8 +436,22 @@ function sendStyles(path, req, res) {
         width: 70%;
         margin-left: auto;
         margin-right: auto;
+        margin-top: 6px;
+        margin-bottom: 12px;
         border: 2px solid black;
         border-radius: 5px;
+        word-wrap: break-word;
+        padding: 12px;
+    }
+
+    #theurlong {
+        width: 70%;
+        height: 230px;
+        word-wrap: break-word;
+    }
+
+    #statusMsg {
+        height: 2em;
     }
     `;
     res.end(styles);
@@ -397,6 +467,8 @@ function error404Page(path, req, res) {
         <body>
             <h1>404 Error - Page Not Found</h1>
             <p>Couldn't find ${path} on server :( </p>
+            <p>I hope it's not a broken urlong!</p>
+            <p>It might be :(</p>
             <p><a href="/">Return Home</a></p>
         </body>
     </html>
