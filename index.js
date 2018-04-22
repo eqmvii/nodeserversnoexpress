@@ -3,7 +3,7 @@ var fs = require("fs");
 var mysql = require("mysql");
 
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000; // prep for Heroku deployment
 
 // sql connection
 var connection = mysql.createConnection({
@@ -15,7 +15,10 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function (err) {
-    if (err) throw err;
+    if (err) {
+        console.log("Error connection to DB...");
+        serverLog("Error connecting to DB :(");
+    }
     console.log(`MySQL DB connected as ${connection.threadId}`);
 });
 
@@ -198,15 +201,15 @@ function getUrlsFromDB(callback) {
     connection.query("SELECT * FROM urls", (err, res) => {
         if (err) throw err;
         console.log(`DB url results length: ${res.length}`);
-        urls = '<ul>'
+        urls = '<ul style="list-style-type: none; margin: 0; padding: 0">'
         for (let i = 0; i < res.length; i++) {
-            urls += '<li>';
-            urls += res[i].url;
-            urls += ' --- <a href="/';
+            urls += '<li style="word-wrap: break-word">';
             urls += res[i].urlong;
-            urls += '">URLong</a></li>';
+            urls += '</li><li>^ ^ ^ ^ ^ ^<a href="/';
+            urls += res[i].urlong;
+            urls += '">URLong</a>^ ^ ^ ^ ^ ^</li>';
         }
-        urls += '</ul>';
+        urls += '</ul><br />';
         // urls = `<h1>Fake URLS</h1>`;
         callback(urls);
     });
