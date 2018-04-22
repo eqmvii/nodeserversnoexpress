@@ -30,7 +30,7 @@ if (process.env.PORT) {
         password: "password", // so secure I know
         database: "urlong_db"
     });
-    appRoot = `http://localhost:4000/`;
+    appRoot = `http://localhost:4000`;
 }
 
 function turnOn(cb) {
@@ -260,20 +260,24 @@ function displayHome(path, req, res) {
                     <title>Node.js Server Testing</title>
                 </head>
             <body>
-                <h1>Hello World!</h1>
-                <p>This is the root.</p>
+                <h1>Urlong</h1>
+                <h3>A URL elongator</h3>
+                <!--<p>This is the root.</p>
                 <p><a href="/test.html">This will serve test.html</a></p>
                 <p><a href="/redirecttest">Redirect Test</a></p>
                 <p><a href="/notARealPage">This link will 404</a></p>
-                <p><a href="/goodbye">Goodbye</a></p>
-                <hr />
-                <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
-                    URL to make long:<br />
-                    <input type="text" name="url"><br />
-                    <input type="submit"></input>
-                </form>
+                <p><a href="/goodbye">Goodbye</a></p>-->
+                <div class="theform">
+                    <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
+                        <h3>URL to make long:</h3>
+                        <input type="text" name="url"><br />
+                        <button type="submit">urlongify</button>
+                    </form>
+                </div>
+                <br />
                 <hr />
                 ${urls}
+                <br />
                 <hr />
                 <p>Coming later: delete all links button</p>
                 <p>Shamefully made by eqmvii</p>
@@ -300,9 +304,9 @@ function getUrlsFromDB(callback) {
             return;
         }
         console.log(`DB url results length: ${res.length}`);
-        urls = '<ul style="list-style-type: none; margin: 0; padding: 0">'
+        urls = '<h1>Sample Long URLS:</h1><ul style="list-style-type: none; margin: 0; padding: 0">'
         for (let i = 0; i < res.length; i++) {
-            urls += `<li style="word-wrap: break-word">${appRoot}`;
+            urls += `<li style="word-wrap: break-word">${appRoot}/`;
             urls += res[i].urlong;
             urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
             urls += res[i].urlong;
@@ -319,10 +323,10 @@ function displayGoodbye(path, req, res) {
     <html>
         <head>
             <link rel="stylesheet" type="text/css" href="style.css">
-            <title>Goodbye!</title>
+            <title>Urlonged!</title>
         </head>
         <body>
-            <h1>Goodbye World!</h1>
+            <h1>Thanks for making a long URL!</h1>
             <p>See you later!</p>
             <p><a href="/">Return Home</a></p>
         </body>
@@ -339,12 +343,45 @@ function sendStyles(path, req, res) {
       font-family: monospace;
     }
 
-    h1, p, a, ul {
+    h1, h3, p, a, ul {
         text-align: center;
     }
 
     li {
-        padding-bottom: 12px;
+        margin-bottom: 12px;
+    }
+
+    input {
+        margin-top: 6px;
+        margin-bottom: 4px;
+        height: 1.9em;
+        border-radius: 5px;
+    }
+
+    button {
+        border: 1px solid blue;
+        background-color: white;
+        color: blue;
+        border-radius: 5px;
+        height: 2.5em;
+        width: 20%;
+        font-weight: bold;
+    }
+
+    button:hover {
+        cursor: pointer;
+        color: white;
+        background-color: blue;
+        border: 1px solid black;
+    }
+
+    .theform {
+        text-align: center;
+        width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+        border: 2px solid black;
+        border-radius: 5px;
     }
     `;
     res.end(styles);
