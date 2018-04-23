@@ -516,6 +516,8 @@ function sendStyles(path, req, res) {
         margin-bottom: 12px;
         margin-right: auto;
         margin-left: auto;
+
+        box-shadow: 1px 2px gray;
     }
 
     .urlongtile a {
@@ -525,6 +527,7 @@ function sendStyles(path, req, res) {
     .urlongtile:hover {
         max-height: none;
         width: 100%;
+        box-shadow: 2px 3px blue;
     }
 
     .urlonglink {
