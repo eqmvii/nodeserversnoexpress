@@ -248,18 +248,19 @@ function addUrlToDb(path, callback) {
 }
 
 function urlongify(shortPath) {
+    var charArray = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYX1234567890';
     var longPath = "";
     if (shortPath.length > 1000) {
         console.log("Woah that's already crazy long");
         return longPath + Date.now() + shortPath;
     }
     for (let i = 0; i < 400; i++) {
-        longPath += Math.floor((Math.random() * 10));
+        longPath += charArray[Math.floor((Math.random() * charArray.length))];
     }
-    longPath += `urlong`;
+    longPath += `url`;
     longPath += Date.now();
-    for (let i = 0; i < 600; i++) {
-        longPath += Math.floor((Math.random() * 10));
+    for (let i = 0; i < 700; i++) {
+        longPath += charArray[Math.floor((Math.random() * charArray.length))];
     }
     return longPath;
 }
@@ -295,27 +296,29 @@ function displayHome(path, req, res) {
                     <title>URLong</title>
                 </head>
             <body>
-                <h1>URLong</h1>
-                <h3>A URL elongator</h3>
-                <!--<p>This is the root.</p>
-                <p><a href="/test.html">This will serve test.html</a></p>
-                <p><a href="/redirecttest">Redirect Test</a></p>
-                <p><a href="/notARealPage">This link will 404</a></p>
-                <p><a href="/goodbye">Goodbye</a></p>-->
-                <div class="theform">
-                    <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
-                        <h3>URL to make long:</h3>
-                        <input type="text" name="url"><br />
-                        <button type="submit">URLongify</button>
-                    </form>
+                <div id="pagewrapper">
+                    <h1>URLong</h1>
+                    <h3>A URL elongator</h3>
+                    <!--<p>This is the root.</p>
+                    <p><a href="/test.html">This will serve test.html</a></p>
+                    <p><a href="/redirecttest">Redirect Test</a></p>
+                    <p><a href="/notARealPage">This link will 404</a></p>
+                    <p><a href="/goodbye">Goodbye</a></p>-->
+                    <div class="theform">
+                        <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
+                            <h3>URL to make long:</h3>
+                            <input type="text" name="url"><br />
+                            <button type="submit">URLongify</button>
+                        </form>
+                    </div>
+                    <br />
+                    <hr />
+                    ${urls}
+                    <br />
+                    <hr />
+                    <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all URLongs from the DB</a></p>
+                    <p>Shamefully made by <a href="https://github.com/eqmvii/urlong">eqmvii</a></p>
                 </div>
-                <br />
-                <hr />
-                ${urls}
-                <br />
-                <hr />
-                <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all URLongs from the DB</a></p>
-                <p>Shamefully made by <a href="https://github.com/eqmvii/urlong">eqmvii</a></p>
                 </body>
         </html>
     `;
@@ -342,22 +345,24 @@ function urlongResults(results, path, req, res) {
                     statusNode.textContent = "urlong copied to your clipboard!";
                   }
                 </script>
-                <h1>URLonged</h1>
-                <h3>You made a URLong</h3>
-                <div class="theform">
-                    <p><a href="${results.urlong}">Test Your URLong</a></p>
-                    <p><strong>Success:</strong> ${results.success}</p>
-                    <p><strong>Msg:</strong> ${results.message}</p>
-                    <p><strong>Original URL:</strong></p>
-                    <p>${results.url}</p>
-                    <p><strong>URLong:</strong></p>
-                    <textarea type="text" id="theurlong" style="text-align: left" value="${appRoot + "/" + results.urlong}">${appRoot + "/" + results.urlong}</textarea>
-                    <p><button onClick="copyText()">Copy URLong to clipboard</button></p>
-                    <p id="statusMsg"></p>
+                <div id="pagewrapper">
+                    <h1>URLonged</h1>
+                    <h3>You made a URLong</h3>
+                    <div class="theform">
+                        <p><a href="${results.urlong}">Test Your URLong</a></p>
+                        <p><strong>Success:</strong> ${results.success}</p>
+                        <p><strong>Msg:</strong> ${results.message}</p>
+                        <p><strong>Original URL:</strong></p>
+                        <p>${results.url}</p>
+                        <p><strong>URLong:</strong></p>
+                        <textarea type="text" id="theurlong" style="text-align: left" value="${appRoot + "/" + results.urlong}">${appRoot + "/" + results.urlong}</textarea>
+                        <p><button onClick="copyText()">Copy URLong to clipboard</button></p>
+                        <p id="statusMsg"></p>
+                    </div>
+                    <br />
+                    <p>See you later!</p>
+                    <p><a href="/">Return Home</a></p>
                 </div>
-                <hr />
-                <p>See you later!</p>
-                <p><a href="/">Return Home</a></p>
             </body>
         </html>
         `;
@@ -375,16 +380,28 @@ function getUrlsFromDB(callback) {
             return;
         }
         console.log(`DB url results length: ${res.length}`);
-        urls = '<h1>Sample Long URLS:</h1><ul style="list-style-type: none; margin: 0; padding: 0">'
+
+        // old version:
+        // urls = '<h1>Sample Long URLS:</h1><ul style="list-style-type: none; margin: 0; padding: 0">'
+        // for (let i = 0; i < res.length; i++) {
+        //     urls += `<li style="word-wrap: break-word">${appRoot}/`;
+        //     urls += res[i].urlong;
+        //     urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
+        //     urls += res[i].urlong;
+        //     urls += '">Test This URLong</a> ^ ^ ^ ^ ^ ^</li>';
+        // }
+        // urls += '</ul><br />';
+        // // urls = `<h1>Fake URLS</h1>`;
+
+        urls = '<h1>Sample Long URLS:</h1>'
         for (let i = 0; i < res.length; i++) {
-            urls += `<li style="word-wrap: break-word">${appRoot}/`;
+            urls += `<div class="urlongtile" style="word-wrap: break-word"><a href="${appRoot}/`;
             urls += res[i].urlong;
-            urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
-            urls += res[i].urlong;
-            urls += '">Test This URLong</a> ^ ^ ^ ^ ^ ^</li>';
+            urls += `">${appRoot}/${res[i].urlong}</a></div>`;
         }
-        urls += '</ul><br />';
+        urls += '<br />';
         // urls = `<h1>Fake URLS</h1>`;
+
         callback(urls);
     });
 }
@@ -397,9 +414,11 @@ function displayGoodbye(path, req, res) {
             <title>URLonged!</title>
         </head>
         <body>
-            <h1>Thanks for making a long URL!</h1>
-            <p>See you later!</p>
-            <p><a href="/">Return Home</a></p>
+            <div id="pagewrapper">
+                <h1>Thanks for making a long URL!</h1>
+                <p>See you later!</p>
+                <p><a href="/">Return Home</a></p>
+            </div>
         </body>
     </html>
     `;
@@ -452,25 +471,62 @@ function sendStyles(path, req, res) {
 
     .theform {
         text-align: center;
-        width: 70%;
+        width: 80%;
         margin-left: auto;
         margin-right: auto;
         margin-top: 6px;
-        margin-bottom: 12px;
+        margin-bottom: 20px;
         border: 2px solid black;
         border-radius: 5px;
         word-wrap: break-word;
         padding: 12px;
     }
 
+    .urlongtile {
+        width: 60%;
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 8px;
+        line-height: 1.4em;
+        max-height: 2.4em;
+        overflow: hidden;
+
+        margin-bottom: 12px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .urlongtile a {
+        text-decoration: none;
+    }
+
+    .urlongtile:hover {
+        max-height: none;
+        width: 100%;
+    }
+
+    .urlonglink {
+        text-align: center;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
     #theurlong {
-        width: 70%;
+        width: 80%;
         height: 230px;
         word-wrap: break-word;
     }
 
     #statusMsg {
         height: 2em;
+    }
+
+    #pagewrapper {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 960px;
     }
     `;
     res.end(styles);
@@ -517,3 +573,5 @@ function turnOff() {
         else { console.log(`### Connection ${connection.threadId} closed ###`); }
     });
 }
+
+// TODO: Add modals?
