@@ -309,9 +309,12 @@ function displayHome(path, req, res) {
         var homeHTML = `
             <html>
                 <head>
-                    <!-- fish transition bug -->
+                    <!-- fix transition bug by keeping pre-transition styles in the html -->
                     <style>
                     .urlongtile {
+                        font-family: monospace;
+                        font-size: 14px;
+
                         width: 50%;
                         border: 1px solid gray;
                         border-radius: 5px;
@@ -325,6 +328,8 @@ function displayHome(path, req, res) {
                         margin-left: auto;
 
                         box-shadow: 1px 1px gray;
+
+                        word-wrap: break-word;
 
                         transition: 0.2s linear;
                     }
@@ -449,7 +454,7 @@ function getUrlsFromDB(callback) {
 
         urls = '<h1>Sample Long URLS:</h1>'
         for (let i = 0; i < res.length; i++) {
-            urls += `<div class="urlongtile" style="word-wrap: break-word"><a href="${appRoot}/`;
+            urls += `<div class="urlongtile"><a href="${appRoot}/`;
             urls += res[i].urlong;
             urls += `">${appRoot}/${res[i].urlong}</a></div>`;
         }
@@ -564,12 +569,6 @@ function sendStyles(path, req, res) {
         margin-bottom: 20px;
 
         font-size: 20px;
-    }
-
-    .urlonglink {
-        text-align: center;
-        padding-top: 6px;
-        padding-bottom: 6px;
     }
 
     #theurlong {
