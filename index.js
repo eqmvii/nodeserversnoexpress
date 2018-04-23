@@ -171,6 +171,9 @@ function finishRequest(request, response) {
                     case "/goodbye":
                         displayGoodbye(path, request, response);
                         break;
+                    case "/admin":
+                        displayAdmin(path, request, response);
+                        break;
                     case "/style.css":
                         sendStyles(path, request, response);
                         break;
@@ -316,7 +319,6 @@ function displayHome(path, req, res) {
                     ${urls}
                     <br />
                     <hr />
-                    <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all URLongs from the DB</a></p>
                     <p>Shamefully made by <a href="https://github.com/eqmvii/urlong">eqmvii</a></p>
                 </div>
                 </body>
@@ -424,6 +426,26 @@ function displayGoodbye(path, req, res) {
     `;
     res.writeHead(200, { "Content-Type": "text/html" });
     res.end(goodbyeHTML);
+}
+
+function displayAdmin(path, req, res) {
+    var adminHTML = `
+    <html>
+        <head>
+            <link rel="stylesheet" type="text/css" href="style.css">
+            <title>Admin</title>
+        </head>
+        <body>
+            <div id="pagewrapper">
+                <h1>Admin</h1>
+                <p><a href="/thisisthesecretdeleteallfromthetableurl">Click to rudely delete all URLongs from the DB</a></p>
+                <p><a href="/">Return Home</a></p>
+            </div>
+        </body>
+    </html>
+    `;
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(adminHTML);
 }
 
 function sendStyles(path, req, res) {
@@ -575,3 +597,9 @@ function turnOff() {
 }
 
 // TODO: Add modals?
+
+// TODO: Make admin have a delete one-by-one page?
+
+// TODO: Auth for admin?
+
+// TODO: Cleanup user input/URL santization and parsing
