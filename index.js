@@ -20,6 +20,8 @@ const HEARTBEAT = 3; // number of seconds to wait between DB pings to keep the c
 var age = 0;
 var appRoot;
 
+appColor = "blue";
+
 
 //
 // SQL connection
@@ -139,16 +141,28 @@ function finishRequest(request, response) {
         }).on('end', () => {
             body = Buffer.concat(body).toString();
             console.log(`Original post body: ${body}`);
-            var postUrl = decodeURIComponent(body.split("=")[1].replace(/\+/g, " ")); //.replace(/\%2F/g, "/").replace(/\%3A/g, ":");
-            console.log(`Acshual: ${postUrl}`);
-            // console.log(`Das YouAreEL: ${myUrl.toString()}`);
-            console.log(postUrl)
-            omniLog(`POST of URL ${postUrl}`);
-            addUrlToDb(postUrl, (results) => {
-                console.log(results);
-                urlongResults(results, path, request, response);
-                // redirectTest(path, request, response);
-            });
+            if (path === "/color") {
+                console.log("It was a color push!");
+                console.log(body);
+                console.log("^ that was the body ^ ");
+                var newColor = body.split("=")[1];
+                appColor = newColor;
+                response.writeHead(302, {
+                    'Location': '/'
+                });
+                response.end();
+            } else {
+                var postUrl = decodeURIComponent(body.split("=")[1].replace(/\+/g, " ")); //.replace(/\%2F/g, "/").replace(/\%3A/g, ":");
+                console.log(`Acshual: ${postUrl}`);
+                // console.log(`Das YouAreEL: ${myUrl.toString()}`);
+                console.log(postUrl)
+                omniLog(`POST of URL ${postUrl}`);
+                addUrlToDb(postUrl, (results) => {
+                    console.log(results);
+                    urlongResults(results, path, request, response);
+                    // redirectTest(path, request, response);
+                });
+            }
         });
     } else { // so it's a GET
         // test for re-routing
@@ -262,7 +276,7 @@ function urlongify(shortPath) {
     }
     longPath += `url`;
     longPath += Date.now();
-    for (let i = 0; i < 700; i++) {
+    for (let i = 0; i < 1100; i++) {
         longPath += charArray[Math.floor((Math.random() * charArray.length))];
     }
     return longPath;
@@ -295,6 +309,29 @@ function displayHome(path, req, res) {
         var homeHTML = `
             <html>
                 <head>
+                    <!-- fish transition bug -->
+                    <style>
+                    .urlongtile {
+                        width: 50%;
+                        border: 1px solid gray;
+                        border-radius: 5px;
+                        padding: 8px;
+                        line-height: 1.4em;
+                        max-height: 2.4em;
+                        overflow: hidden;
+
+                        margin-bottom: 12px;
+                        margin-right: auto;
+                        margin-left: auto;
+
+                        box-shadow: 1px 1px gray;
+
+                        transition: 0.2s linear;
+                    }
+                    .urlongtile a {
+                        text-decoration: none;
+                    }
+                    </style>
                     <link rel="stylesheet" type="text/css" href="style.css">
                     <title>URLong</title>
                 </head>
@@ -315,11 +352,26 @@ function displayHome(path, req, res) {
                         </form>
                     </div>
                     <br />
-                    <hr />
                     ${urls}
                     <br />
                     <hr />
                     <p>Shamefully made by <a href="https://github.com/eqmvii/urlong">eqmvii</a></p>
+                    <br />
+                    <hr />
+                    <div style="text-align: center;">
+                        <h3>Change page color</h3>
+                        <form id="colorform" name="colorform" action="/color" method="post">
+                            <select id="colorselect" name="color">
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="black">Black</option>
+                            </select>
+                            <br />
+                            <button type="submit">Change Color</button>
+                        </form>
+                    </div>
+                    <br />
+                    <hr />
                 </div>
                 </body>
         </html>
@@ -451,7 +503,7 @@ function displayAdmin(path, req, res) {
 function sendStyles(path, req, res) {
     var styles = `
     body {
-      color: blue;
+      color: ${appColor};
       font-family: monospace;
       font-size: 14px;
     }
@@ -472,22 +524,21 @@ function sendStyles(path, req, res) {
     }
 
     button {
-        border: 1px solid blue;
+        border: 1px solid ${appColor};
         background-color: white;
-        color: blue;
+        color: ${appColor};
         border-radius: 5px;
         height: 3.5em;
         width: 20%;
         font-weight: bold;
         padding: 6px;
         margin-top: 6px;
-
     }
 
     button:hover {
         cursor: pointer;
         color: white;
-        background-color: blue;
+        background-color: ${appColor};
         border: 1px solid black;
     }
 
@@ -504,33 +555,15 @@ function sendStyles(path, req, res) {
         padding: 12px;
     }
 
-    .urlongtile {
-        width: 60%;
-        border: 1px solid gray;
-        border-radius: 5px;
-        padding: 8px;
-        line-height: 1.4em;
-        max-height: 2.4em;
-        overflow: hidden;
-
-        margin-bottom: 12px;
-        margin-right: auto;
-        margin-left: auto;
-
-        box-shadow: 1px 1px gray;
-    }
-
-    .urlongtile a {
-        text-decoration: none;
-    }
-
     .urlongtile:hover {
-        max-height: none;
+        max-height: 26em;
         width: 100%;
-        box-shadow: 2px 2px blue;
+        box-shadow: 2px 2px ${appColor};
 
         margin-top: 16px;
         margin-bottom: 20px;
+
+        font-size: 20px;
     }
 
     .urlonglink {
@@ -555,6 +588,12 @@ function sendStyles(path, req, res) {
         margin-left: auto;
         margin-right: auto;
         max-width: 960px;
+    }
+
+    #colorselect {
+        width: 10%;
+        height: 2em;
+        border-radius: 5px;
     }
     `;
     res.end(styles);
