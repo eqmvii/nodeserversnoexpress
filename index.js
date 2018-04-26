@@ -311,6 +311,7 @@ function displayHome(path, req, res) {
                 <head>
                     <!-- fix transition bug by keeping pre-transition styles in the html -->
                     <style>
+                    @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700&effect=3d-float');
                     .urlongtile {
                         font-family: monospace;
                         font-size: 14px;
@@ -335,6 +336,7 @@ function displayHome(path, req, res) {
                     }
                     .urlongtile a {
                         text-decoration: none;
+                        color: black;
                     }
                     </style>
                     <link rel="stylesheet" type="text/css" href="style.css">
@@ -342,8 +344,7 @@ function displayHome(path, req, res) {
                 </head>
             <body>
                 <div id="pagewrapper">
-                    <h1>URLong</h1>
-                    <h3>A URL elongator</h3>
+                    <h1 class="font-effect-3d-float" style="font-family: 'Source Sans Pro', sans-serif; color: firebrick;">URLong</h1>
                     <!--<p>This is the root.</p>
                     <p><a href="/test.html">This will serve test.html</a></p>
                     <p><a href="/redirecttest">Redirect Test</a></p>
@@ -392,6 +393,9 @@ function urlongResults(results, path, req, res) {
             <head>
                 <link rel="stylesheet" type="text/css" href="style.css">
                 <title>URLonging Results</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700&effect=fire-animation');
+                </style>
             </head>
             <body>
                 <script>
@@ -405,8 +409,7 @@ function urlongResults(results, path, req, res) {
                   }
                 </script>
                 <div id="pagewrapper">
-                    <h1>URLonged</h1>
-                    <h3>You made a URLong</h3>
+                    <h1 style="font-family: 'Source Sans Pro', sans-serif; color: lightslategray;" class="font-effect-fire-animation">You made a URLong</h1>
                     <div class="theform">
                         <p><a href="${results.urlong}">Test Your URLong</a></p>
                         <p><strong>Success:</strong> ${results.success}</p>
