@@ -38,7 +38,6 @@ if (process.env.PORT) {
     });
     console.log("CONNECTION:");
     console.log(connection);
-    appRoot = `https://urlong.herokuapp.com`;
 } else {
     connection = mysql.createConnection({
         host: "localhost",
@@ -47,7 +46,6 @@ if (process.env.PORT) {
         password: "password", // so secure I know
         database: "urlong_db"
     });
-    appRoot = `http://localhost:4000`;
 }
 
 
@@ -125,6 +123,7 @@ function deleteAll() {
 // Pointless middleware due to early confusion
 // TODO: Remove this
 function handleRequest(request, response) {
+    appRoot = request.headers.host;
     finishRequest(request, response);
 }
 
@@ -350,8 +349,6 @@ function displayHome(path, req, res) {
                     <p><a href="/redirecttest">Redirect Test</a></p>
                     <p><a href="/notARealPage">This link will 404</a></p>
                     <p><a href="/goodbye">Goodbye</a></p>-->
-                    <h1>${__dirname}</h1>
-                    <h1>${req.headers.host}</h1>
                     <div class="theform">
                         <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
                             <h3>URL to make long:</h3>
@@ -419,7 +416,7 @@ function urlongResults(results, path, req, res) {
                         <p><strong>Original URL:</strong></p>
                         <p>${results.url}</p>
                         <p><strong>URLong:</strong></p>
-                        <textarea type="text" id="theurlong" style="text-align: left" value="${appRoot + "/" + results.urlong}">${appRoot + "/" + results.urlong}</textarea>
+                        <textarea type="text" id="theurlong" style="text-align: left" value="${req.headers.host + "/" + results.urlong}">${req.headers.host + "/" + results.urlong}</textarea>
                         <p><button onClick="copyText()">Copy URLong to clipboard</button></p>
                         <p id="statusMsg"></p>
                     </div>
@@ -434,6 +431,7 @@ function urlongResults(results, path, req, res) {
     res.end(URLongHTML);
 }
 
+// TODO: Pass this request to avoid needing to use a global variable for appRoot?
 function getUrlsFromDB(callback) {
     connection.query("SELECT * FROM urls", (err, res) => {
         if (err) {
@@ -445,23 +443,11 @@ function getUrlsFromDB(callback) {
         }
         console.log(`DB url results length: ${res.length}`);
 
-        // old version:
-        // urls = '<h1>Sample Long URLS:</h1><ul style="list-style-type: none; margin: 0; padding: 0">'
-        // for (let i = 0; i < res.length; i++) {
-        //     urls += `<li style="word-wrap: break-word">${appRoot}/`;
-        //     urls += res[i].urlong;
-        //     urls += '</li><li>^ ^ ^ ^ ^ ^ <a href="/';
-        //     urls += res[i].urlong;
-        //     urls += '">Test This URLong</a> ^ ^ ^ ^ ^ ^</li>';
-        // }
-        // urls += '</ul><br />';
-        // // urls = `<h1>Fake URLS</h1>`;
-
         urls = '<h1>Sample Long URLS:</h1>'
         for (let i = 0; i < res.length; i++) {
-            urls += `<div class="urlongtile"><a href="${appRoot}/`;
+            urls += `<div class="urlongtile"><a href="http://${appRoot}/`;
             urls += res[i].urlong;
-            urls += `">${appRoot}/${res[i].urlong}</a></div>`;
+            urls += `">http://${appRoot}/${res[i].urlong}</a></div>`;
         }
         urls += '<br />';
         // urls = `<h1>Fake URLS</h1>`;
