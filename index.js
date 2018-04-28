@@ -18,7 +18,6 @@ var mysql = require("mysql");
 const PORT = process.env.PORT || 4000; // prep for Heroku deployment
 const HEARTBEAT = 3; // number of seconds to wait between DB pings to keep the connection alive
 var age = 0;
-var appRoot;
 
 appColor = "blue";
 
@@ -123,7 +122,6 @@ function deleteAll() {
 // Pointless middleware due to early confusion
 // TODO: Remove this
 function handleRequest(request, response) {
-    appRoot = request.headers.host;
     finishRequest(request, response);
 }
 
@@ -275,7 +273,7 @@ function urlongify(shortPath) {
     }
     longPath += `url`;
     longPath += Date.now();
-    for (let i = 0; i < 1100; i++) {
+    for (let i = 0; i < 900; i++) {
         longPath += charArray[Math.floor((Math.random() * charArray.length))];
     }
     return longPath;
@@ -304,7 +302,7 @@ function omniLog(text) {
 }
 
 function displayHome(path, req, res) {
-    getUrlsFromDB((urls) => {
+    getUrlsFromDB(path, req, res, (urls) => {
         var homeHTML = `
             <html>
                 <head>
@@ -322,6 +320,7 @@ function displayHome(path, req, res) {
                         line-height: 1.4em;
                         max-height: 2.4em;
                         overflow: hidden;
+                        text-overflow: ellipsis;
 
                         margin-bottom: 12px;
                         margin-right: auto;
@@ -431,8 +430,7 @@ function urlongResults(results, path, req, res) {
     res.end(URLongHTML);
 }
 
-// TODO: Pass this request to avoid needing to use a global variable for appRoot?
-function getUrlsFromDB(callback) {
+function getUrlsFromDB(path, req, res, callback) {
     connection.query("SELECT * FROM urls", (err, res) => {
         if (err) {
             console.log("Error looking for URL in DB");
@@ -445,9 +443,9 @@ function getUrlsFromDB(callback) {
 
         urls = '<h1>Sample Long URLS:</h1>'
         for (let i = 0; i < res.length; i++) {
-            urls += `<div class="urlongtile"><a href="http://${appRoot}/`;
+            urls += `<div class="urlongtile"><a href="http://${req.headers.host}/`;
             urls += res[i].urlong;
-            urls += `">http://${appRoot}/${res[i].urlong}</a></div>`;
+            urls += `">http://${req.headers.host}/${res[i].urlong}</a></div>`;
         }
         urls += '<br />';
         // urls = `<h1>Fake URLS</h1>`;
@@ -586,6 +584,7 @@ function sendStyles(path, req, res) {
         border-radius: 5px;
     }
     `;
+    res.writeHead(200, { "Content-Type": "text/css" });
     res.end(styles);
 }
 
