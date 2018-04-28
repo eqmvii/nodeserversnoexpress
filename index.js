@@ -350,6 +350,8 @@ function displayHome(path, req, res) {
                     <p><a href="/redirecttest">Redirect Test</a></p>
                     <p><a href="/notARealPage">This link will 404</a></p>
                     <p><a href="/goodbye">Goodbye</a></p>-->
+                    <h1>${__dirname}</h1>
+                    <h1>${req.headers.host}</h1>
                     <div class="theform">
                         <form enctype="application/x-www-form-urlencoded;charset=UTF-8" action="/addurl" method="post">
                             <h3>URL to make long:</h3>
